@@ -4,4 +4,6 @@ class SunClass < ActiveRecord::Base
 
   has_many :wait_list_assignments
   has_many :wait_list_students, :class_name => Student, :through => :wait_list_assignments
+
+  has_many :preferences
 end

@@ -1,3 +1,5 @@
 SUNClasses::Application.routes.draw do
-  root :to => 'visitors#new'
+  resources :students
+  resources :classes
+  root :to => 'sun_classes#index'
 end
