@@ -14,7 +14,7 @@ class SunClass < ActiveRecord::Base
     header = spreadsheet.row(1)
     (2..spreadsheet.last_row).each do |i|
       row = Hash[[header, spreadsheet.row(i)].transpose]
-      sun_class = find_by_id(row["id"]) || new
+      sun_class = where(name: row["name"], day: row["day"]).first || new
       parameters = ActionController::Parameters.new(row.to_hash)
       sun_class.attributes = parameters.permit(:name,:limit,:day)
       sun_class.save!
