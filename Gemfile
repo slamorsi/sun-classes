@@ -16,6 +16,7 @@ gem 'thin'
 
 gem 'roo'
 gem 'pg', :group => :production
+gem 'rails_12factor', group: :production
 gem 'sqlite3', :group => [:development,:test]
 group :development do
   gem 'better_errors'
