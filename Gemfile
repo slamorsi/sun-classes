@@ -8,12 +8,14 @@ gem 'coffee-rails', '~> 4.0.0'
 gem 'jquery-rails'
 # gem 'turbolinks'
 gem 'jbuilder', '~> 1.2'
-gem 'bootstrap-sass', '~> 2.3.2.2'
+gem 'bootstrap-sass', github: 'thomas-mcdonald/bootstrap-sass', branch: '3'
 gem 'figaro'
 gem 'haml-rails'
-gem 'high_voltage'
+# gem 'high_voltage'
 gem 'simple_form', '>= 3.0.0.rc'
 gem 'thin'
+
+gem 'roo'
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller', :platforms=>[:mri_19, :mri_20, :rbx]

@@ -1,2 +1,25 @@
-%h1 SunClasses#index
-%p Find me in app/views/sun_classes/index.html.haml
+.page-header
+  %h1 Sun Classes
+
+.row
+  .col-md-12
+    = form_tag import_sun_classes_path, multipart: true do
+      %legend Import Classes
+      .form-group
+        = file_field_tag :file
+      = submit_tag "Import", :class => 'btn btn-default'
+.row
+  %table.table.table-striped.table-hover.col-md-12.top-buffer
+    %thead
+      %tr
+        %th Mon
+        %th Tues
+        %th Wed
+        %th Thurs
+    %tbody
+      -(0..@maxNumClasses).each do |n|
+        %tr
+          %td=link_to(@monClasses[n].name,@monClasses[n]) if @monClasses.length > n
+          %td=link_to(@tuesClasses[n].name,@tuesClasses[n]) if @tuesClasses.length > n
+          %td=link_to(@wedClasses[n].name,@wedClasses[n]) if @wedClasses.length > n
+          %td=link_to(@thursClasses[n].name,@thursClasses[n]) if @thursClasses.length > n
