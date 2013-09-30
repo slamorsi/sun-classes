@@ -15,7 +15,7 @@ class StudentsController < ApplicationController
   end
 
   def index
-    @students = Student.includes(:preferences).order('"preference.hour" ASC', '"preference.order" ASC').references(:preferences).load
+    @students = Student.includes(:preferences).order('"preferences.hour" ASC', '"preferences.order" ASC').references(:preferences).load
   end
 
   def show
