@@ -2,13 +2,14 @@
   %h1 Sun Classes
 
 .row
-  = form_tag import_sun_classes_path, multipart: true do
-    %legend Import Classes
-    .form-group
-      = file_field_tag :file
-    = submit_tag "Import", :class => 'btn btn-primary'
-  = form_tag clear_sun_classes_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all current classes, are you sure?');" do
-    = submit_tag "Clear Existing Classes", :class => 'btn btn-danger'
+  .col-md-12
+    = form_tag import_sun_classes_path, multipart: true do
+      %legend Import Classes
+      .form-group
+        = file_field_tag :file
+      = submit_tag "Import", :class => 'btn btn-primary'
+    = form_tag clear_sun_classes_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all current classes, are you sure?');" do
+      = submit_tag "Clear Existing Classes", :class => 'btn btn-danger'
 .row
   %table.table.table-striped.table-hover.col-md-12.top-buffer
     %thead
