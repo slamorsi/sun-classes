@@ -1,5 +1,6 @@
 module SunClassesHelper
   def maxNumClasses(sClasses)
-    sClasses.map { |c| c.length }.max
+    return 0 if sClasses.nil? || sClasses.length == 0
+    sClasses.map { |c| c.length if c }.max || -1
   end
 end

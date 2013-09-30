@@ -1,1 +1,8 @@
-= link_to "Sunclasses", root_path, :class => 'navbar-brand'
+%navbar-header
+  = link_to "Sunclasses", root_path, :class => 'navbar-brand'
+  %ul.nav.navbar-nav.navbar-right
+    %li=link_to "Classes", sun_classes_path
+    %li=link_to "Students", students_path
+
+
+

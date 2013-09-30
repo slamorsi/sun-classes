@@ -5,7 +5,7 @@ class SunClassesController < ApplicationController
       SunClass.import(params[:file])
       redirect_to sun_classes_path, notice: "Classes imported."
     else
-      render action: "index", error: "Missing file."
+      redirect_to sun_classes_path, alert: "Missing file.", status: :unprocessable_entity
     end
   end
 
