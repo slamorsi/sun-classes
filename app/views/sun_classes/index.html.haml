@@ -2,24 +2,38 @@
   %h1 Sun Classes
 
 .row
-  .col-md-12
-    = form_tag import_sun_classes_path, multipart: true do
-      %legend Import Classes
-      .form-group
-        = file_field_tag :file
-      = submit_tag "Import", :class => 'btn btn-default'
+  = form_tag import_sun_classes_path, multipart: true do
+    %legend Import Classes
+    .form-group
+      = file_field_tag :file
+    = submit_tag "Import", :class => 'btn btn-primary'
+  = form_tag clear_sun_classes_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all current classes, are you sure?');" do
+    = submit_tag "Clear Existing Classes", :class => 'btn btn-danger'
 .row
   %table.table.table-striped.table-hover.col-md-12.top-buffer
     %thead
       %tr
+        %th
         %th Mon
         %th Tues
         %th Wed
         %th Thurs
     %tbody
-      -(0..@maxNumClasses).each do |n|
-        %tr
-          %td=link_to(@monClasses[n].name,@monClasses[n]) if @monClasses.length > n
-          %td=link_to(@tuesClasses[n].name,@tuesClasses[n]) if @tuesClasses.length > n
-          %td=link_to(@wedClasses[n].name,@wedClasses[n]) if @wedClasses.length > n
-          %td=link_to(@thursClasses[n].name,@thursClasses[n]) if @thursClasses.length > n
+      %tr
+        %td Hour 1
+        -(0..maxNumClasses([@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1])).each do |n|
+          %tr
+            %td
+            %td=link_to(@monClasses_hour1[n].name,@monClasses_hour1[n]) if @monClasses_hour1.length > n
+            %td=link_to(@tuesClasses_hour1[n].name,@tuesClasses_hour1[n]) if @tuesClasses_hour1.length > n
+            %td=link_to(@wedClasses_hour1[n].name,@wedClasses_hour1[n]) if @wedClasses_hour1.length > n
+            %td=link_to(@thursClasses_hour1[n].name,@thursClasses_hour1[n]) if @thursClasses_hour1.length > n
+      %tr
+        %td Hour 2
+        -(0..maxNumClasses([@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2])).each do |n|
+          %tr
+            %td
+            %td=link_to(@monClasses_hour2[n].name,@monClasses_hour2[n]) if @monClasses_hour2.length > n
+            %td=link_to(@tuesClasses_hour2[n].name,@tuesClasses_hour2[n]) if @tuesClasses_hour2.length > n
+            %td=link_to(@wedClasses_hour2[n].name,@wedClasses_hour2[n]) if @wedClasses_hour2.length > n
+            %td=link_to(@thursClasses_hour2[n].name,@thursClasses_hour2[n]) if @thursClasses_hour2.length > n

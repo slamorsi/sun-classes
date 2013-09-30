@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130929182926) do
+ActiveRecord::Schema.define(version: 20130930001548) do
 
   create_table "class_assignments", force: true do |t|
     t.integer  "sun_class_id"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20130929182926) do
     t.string   "day"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "hour"
   end
 
   create_table "wait_list_assignments", force: true do |t|
