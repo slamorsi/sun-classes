@@ -8,6 +8,8 @@ class Student < ActiveRecord::Base
 
   has_many :preferences, :dependent => :destroy 
 
+  scope :sorted_preferences, -> {order("case when preferences.day='Mon' then 1 when preferences.day='Tues' then 2 when preferences.day='Wed' then 3 when preferences.day='Thurs' then 4 else 5 end ASC,preferences.hour ASC,preferences.hour ASC")}
+
   def full_name
     "#{self.first_name.present? ? self.first_name + " " : ""}#{self.last_name}"
   end

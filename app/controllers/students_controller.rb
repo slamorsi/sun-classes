@@ -3,7 +3,7 @@ class StudentsController < ApplicationController
   def import
     if params[:file]
       Student.import(params[:file])
-      redirect_to students_path, notice: "Classes imported."
+      redirect_to students_path, notice: "Students imported."
     else
       redirect_to students_path, alert: "Missing file.", status: :unprocessable_entity
     end
@@ -15,7 +15,7 @@ class StudentsController < ApplicationController
   end
 
   def index
-    @students = Student.includes(:preferences).order('preferences.hour ASC', 'preferences.order ASC').references(:preferences).load
+    @students = Student.includes(:preferences).sorted_preferences.references(:preferences).order('students.last_name ASC').load
   end
 
   def show
