@@ -27,7 +27,7 @@ class StudentsController < ApplicationController
   end
 
   def index
-    @students = Student.includes(:sun_classes).sorted_classes.includes(:wait_list_classes).sorted_wait_classes.includes(:preferences).sorted_preferences.references(:preferences, :sun_classes).order('students.last_name ASC').load
+    @students = Student.includes(:sun_classes).sorted_classes.includes(:wait_list_classes).sorted_wait_classes.includes(:preferences).sorted_preferences.includes(:wait_list_assignments).references(:preferences, :sun_classes, :wait_list_assignments).order('students.last_name ASC').load
   end
 
   def show

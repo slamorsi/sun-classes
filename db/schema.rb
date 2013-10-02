@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131001221418) do
+ActiveRecord::Schema.define(version: 20131002152649) do
 
   create_table "class_assignments", force: true do |t|
     t.integer  "sun_class_id"
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 20131001221418) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "preference"
+    t.string   "reason"
   end
 
 end

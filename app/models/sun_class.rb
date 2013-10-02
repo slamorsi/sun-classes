@@ -17,14 +17,22 @@ class SunClass < ActiveRecord::Base
     allowed_params = :name,:limit,:day, :hour
     spreadsheet = open_spreadsheet(file)
 
-    header = spreadsheet.row(1)
-    (0..spreadsheet.last_column).step(3) do |ci|
+    hour_col = 1
+    header = spreadsheet.row(1).map{ |h| h.strip.downcase}
+    (2..spreadsheet.last_column).step(2) do |ci|
+      hi = ci-1
       (2..spreadsheet.last_row).each do |i|
-        header = header[ci..ci+2].map{ |h| h.strip.downcase}
-        row = Hash[[header, spreadsheet.row(i)[ci..ci+2]].transpose]
+        next if spreadsheet.empty?(i,ci)
+        logger.debug "name: #{spreadsheet.cell(i,ci)}"
+        logger.debug "ci: #{ci}, i:#{i}"
+        logger.debug "hi: #{hi}, header: #{header}"
+        logger.debug "row: #{spreadsheet.row(i)[hi..hi+1]}"
+        row = Hash[[header[hi..hi+1], spreadsheet.row(i)[hi..hi+1]].transpose]
         #day columns are headed by the name of the day (column ci+1)
-        row['day'] = header[ci+1]
-        row['name'] = row[header[ci+1]]
+        row['day'] = header[hi]
+        logger.debug "day: #{row['day']}"
+        row['name'] = row[header[hi]]
+        row['hour'] = spreadsheet.cell(i, hour_col)
         row.delete_if {|k,v| !k.in? allowed_params.map{|p| p.to_s}}
 
         sun_class = where(name: row["name"], day: row["day"], hour: row["hour"]).first || new

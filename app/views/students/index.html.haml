@@ -1,7 +1,7 @@
 .page-header
   %h1 Sun Students
 .row
-  .col-md-12
+  .col-sm-6
     = form_tag import_students_path, multipart: true do
       %legend Import Students
       .form-group
@@ -9,9 +9,9 @@
       = submit_tag "Import", :class => 'btn btn-primary'
     = form_tag clear_students_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all current students, are you sure?');" do
       = submit_tag "Clear Existing Students", :class => 'btn btn-danger'
-.row
-  .col-md-12
-    = form_tag assign_all_students_path, :class => 'top-buffer' do
+  .col-sm-6
+    = form_tag assign_all_students_path do
+      %legend Class Assignment
       = submit_tag "Assign Students", :class => 'btn btn-success'
     = form_tag clear_all_assignments_students_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all class assignments, are you sure?');" do
       = submit_tag "Clear class assignments", :class => 'btn btn-danger'
@@ -34,14 +34,15 @@
                 %li 
                   "#{c.day} Hour #{c.hour} 
                   =link_to c.name, c
-            -if s.wait_list_classes.length > 0
+            -if s.wait_list_assignments.length > 0
               %br 
               Wait listed for:
               %ol
-                -s.wait_list_classes.each do |c|
+                -s.wait_list_assignments.each do |c|
                   %li 
-                    "#{c.day} Hour #{c.hour} 
-                    =link_to c.name, c
+                    #{c.sun_class.day} Hour #{c.sun_class.hour} 
+                    =link_to c.sun_class.name, c.sun_class
+                    \-#{c.reason}
           %td
             %ol
               -s.preferences.each do |p|

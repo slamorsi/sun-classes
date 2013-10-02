@@ -3,8 +3,8 @@ class Student < ActiveRecord::Base
   has_many :class_assignments, :dependent => :destroy
   has_many :sun_classes, :through => :class_assignments
 
-  has_many :wait_list_assignment, :dependent => :destroy
-  has_many :wait_list_classes, :source => :sun_class, :through => :wait_list_assignment
+  has_many :wait_list_assignments, :dependent => :destroy
+  has_many :wait_list_classes, :source => :sun_class, :through => :wait_list_assignments
 
   has_many :preferences, :dependent => :destroy 
 
@@ -35,8 +35,8 @@ class Student < ActiveRecord::Base
         #student must find spot in both hours so build instead of create assignments and save if both hours were filled
 
         #skip if student already has assigned class for this day and hour or if they have a class with same name on a different day or hour but they are in the non-dupe list
-        if !assigned.find {|a| (a.day == day and a.hour == hour) or a.name.in?(SunClass::NON_DUPE_CLASSES)}.nil?
-          hours_to_fill =-1
+        if !assigned.find {|a| already_assigned = (a.day == day and a.hour == hour) or a.name.in?(SunClass::NON_DUPE_CLASSES)}.nil?
+          hours_to_fill =-1 if already_assigned
           next
         end
         logger.debug "Choosing class for day: #{day} hour: #{hour}"
@@ -48,14 +48,14 @@ class Student < ActiveRecord::Base
           wanted_pref2 = preferences.find {|p| p.day == day and p.hour == hour and p.order ==2 }
           if wanted_pref2.nil?
             logger.debug "Creating waiting list assignment for first"
-            self.wait_list_assignment.find_or_create_by :sun_class => wanted, :preference => 1
+            self.wait_list_assignment.find_or_create_by :sun_class => wanted, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
           else 
             logger.debug "Found preference: #{wanted2.to_json}"
             wanted2 = wanted_pref2.sun_class
             if wanted2.full?
               logger.debug "Creating waiting list assignment for both"
-              self.wait_list_assignment.find_or_create_by :sun_class => wanted2, :preference => 2
-              self.wait_list_assignment.find_or_create_by :sun_class => wanted, :preference => 1
+              self.wait_list_assignment.find_or_create_by :sun_class => wanted2, :preference => 2, :reason => WaitListAssignment::REASONS[:full]
+              self.wait_list_assignment.find_or_create_by :sun_class => wanted, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
             else
               logger.debug "Creating assignment for second"
               pending_pref = wanted_pref2
@@ -80,7 +80,7 @@ class Student < ActiveRecord::Base
         #otherwise we know they only found a class for one hour and we insert that class into wait list assignment
         pending_assignment.delete
 
-        self.wait_list_assignment.find_or_create_by :sun_class => pending_pref.sun_class, :preference => pending_pref.order 
+        self.wait_list_assignment.find_or_create_by :sun_class => pending_pref.sun_class, :preference => pending_pref.order, :reason => WaitListAssignment::REASONS[:invalid_hours] 
       end
     end
   end
@@ -93,7 +93,7 @@ class Student < ActiveRecord::Base
     header = spreadsheet.row(1)
     (2..spreadsheet.last_row).step(2) do |i|
       #sets the last, first names
-      names = Hash[[header[0..1].map{ |n| n.strip.downcase+'_name'}, spreadsheet.row(i)[0..1].map{|n| n.strip}].transpose]
+      names = Hash[[header[0..1].map{ |n| n.strip.downcase+'_name'}, spreadsheet.row(i)[0..1].map{|n| n.strip if n}].transpose]
       logger.debug "(#{i}) Student names: #{names}"
 
       parameters = ActionController::Parameters.new(names.to_hash)

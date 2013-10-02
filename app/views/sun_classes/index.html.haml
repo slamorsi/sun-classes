@@ -2,7 +2,7 @@
   %h1 Sun Classes
 
 .row
-  .col-md-12
+  .col-sm-6
     = form_tag import_sun_classes_path, multipart: true do
       %legend Import Classes
       .form-group
@@ -10,6 +10,12 @@
       = submit_tag "Import", :class => 'btn btn-primary'
     = form_tag clear_sun_classes_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all current classes, are you sure?');" do
       = submit_tag "Clear Existing Classes", :class => 'btn btn-danger'
+  .col-sm-6
+    = form_tag assign_all_students_path do
+      %legend Class Assignment
+      = submit_tag "Assign Students", :class => 'btn btn-success'
+    = form_tag clear_all_assignments_students_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all class assignments, are you sure?');" do
+      = submit_tag "Clear class assignments", :class => 'btn btn-danger'
 .row
   %table.table.table-striped.table-hover.col-md-12.top-buffer
     %thead
