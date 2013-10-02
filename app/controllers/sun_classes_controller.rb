@@ -43,7 +43,7 @@ class SunClassesController < ApplicationController
   end
 
   def show
-    @sun_class = SunClass.includes(:students, :wait_list_students).references(:students, :wait_list_assignments, :class_assignments).find(params[:id])
+    @sun_class = SunClass.includes(:students, :wait_list_students, :class_assignments, :wait_list_assignments).references(:students, :wait_list_assignments, :class_assignments).find(params[:id])
   end
 
   def create

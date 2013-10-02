@@ -1,2 +1,11 @@
-%h1 Students#show
-%p Find me in app/views/students/show.html.haml
+.page-header
+  %h1
+    =@student.full_name 
+    %small
+      =link_to 'Edit', edit_student_path(@student)
+    %small
+      =link_to 'Delete', student_path(@student), :method => :delete, :confirm => 'Are you sure? This will delete the student!'
+.row
+  .col-md-12
+    %h2 Assigned Classes
+    =render :partial => 'sun_classes/student_classes', :locals => {:sun_classes => @student.sun_classes, :wait_list_assignments => @student.wait_list_assignments}

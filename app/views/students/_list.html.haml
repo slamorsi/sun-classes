@@ -8,8 +8,8 @@
   %tbody
     -students.each do |s|
       %tr
-        %td=s.last_name
-        %td=s.first_name
+        %td=link_to s.last_name, student_path(s)
+        %td=link_to s.first_name, student_path(s)
         %td
           %ol
             -s.sun_classes.each do |c|

@@ -1,0 +1,22 @@
+%table.table.table-striped.table-hover.col-md-12.top-buffer
+  %thead
+    %tr
+      %th
+      %th Mon 
+      %th Tues 
+      %th Wed 
+      %th Thurs 
+  %tbody
+    -(1..2).each do |hour|
+      %tr
+        %td Hour #{hour}
+      %tr
+        %td
+        -%w(mon tues wed thurs).each do |day|
+          %td
+            -if sun_classes.find_by_day_and_hour(day, hour)
+              =link_to sun_classes.find_by_day_and_hour(day, hour).name, sun_classes.find_by_day_and_hour(day, hour) 
+            -else
+              %ol
+                -wait_list_assignments.includes(:sun_class).references(:sun_classes).where('sun_classes.day = ? and sun_classes.hour = ?',day, hour).each do |a|
+                  %li Wait listed for #{a.sun_class.name}: #{a.reason}
