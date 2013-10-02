@@ -1,2 +1,5 @@
-%h1 SunClasses#new
-%p Find me in app/views/sun_classes/new.html.haml
+.page-header
+  %h1 Create a new Sun Class
+.row
+  .col-md-12
+    =render :partial => 'form', :locals =>{:sun_class => @sun_class}

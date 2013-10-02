@@ -1,12 +1,14 @@
 class Student < ActiveRecord::Base
   extend Importable
-  has_many :class_assignments, :dependent => :destroy
+  has_many :class_assignments, :dependent => :destroy, :after_add => :class_assignment_added
   has_many :sun_classes, :through => :class_assignments
 
   has_many :wait_list_assignments, :dependent => :destroy
   has_many :wait_list_classes, :source => :sun_class, :through => :wait_list_assignments
 
   has_many :preferences, :dependent => :destroy 
+
+  validates_presence_of :first_name, :last_name
 
   scope :sorted_preferences, -> {order("case when preferences.day='mon' then 1 when preferences.day='tues' then 2 when preferences.day='wed' then 3 when preferences.day='thurs' then 4 else 5 end ASC,preferences.hour ASC,'preferences.order' ASC")}
 
@@ -31,56 +33,62 @@ class Student < ActiveRecord::Base
       hours_to_fill = 2
       pending_pref = nil
       pending_assignment = nil
-      [1,2].each do |hour|
+      [1,2].each do |hour| 
+        wanted = nil
+        wanted2 = nil
         #student must find spot in both hours so build instead of create assignments and save if both hours were filled
+        logger.debug "Choosing class for day: #{day} hour: #{hour}"
 
-        #skip if student already has assigned class for this day and hour or if they have a class with same name on a different day or hour but they are in the non-dupe list
-        if !assigned.find {|a| already_assigned = (a.day == day and a.hour == hour) or a.name.in?(SunClass::NON_DUPE_CLASSES)}.nil?
-          hours_to_fill =-1 if already_assigned
+        #skip if student already has assigned class for this day and hour
+        if isAlreadyAssigned?(assigned, day, hour)
+          hours_to_fill -= 1
           next
         end
-        logger.debug "Choosing class for day: #{day} hour: #{hour}"
-        wanted_pref1 = preferences.find {|p| p.day == day and p.hour == hour and p.order ==1 }
-        next if wanted_pref1.nil?
-        logger.debug "Found preference: #{wanted_pref1.to_json}"
-        wanted = wanted_pref1.sun_class
-        if wanted.full?
-          wanted_pref2 = preferences.find {|p| p.day == day and p.hour == hour and p.order ==2 }
-          if wanted_pref2.nil?
-            logger.debug "Creating waiting list assignment for first"
-            self.wait_list_assignment.find_or_create_by :sun_class => wanted, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
-          else 
-            logger.debug "Found preference: #{wanted2.to_json}"
-            wanted2 = wanted_pref2.sun_class
-            if wanted2.full?
-              logger.debug "Creating waiting list assignment for both"
-              self.wait_list_assignment.find_or_create_by :sun_class => wanted2, :preference => 2, :reason => WaitListAssignment::REASONS[:full]
-              self.wait_list_assignment.find_or_create_by :sun_class => wanted, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
-            else
-              logger.debug "Creating assignment for second"
-              pending_pref = wanted_pref2
-              pending_assignment = self.class_assignments.where(sun_class_id: wanted2.id).first || self.class_assignments.build(sun_class: wanted2)
 
-              hours_to_fill -= 1
-            end
-          end
+        pending_pref1 = processPreference(1,day, hour, preferences, assigned)
+        #if first pref is open then pend assignment and continue
+        if pending_pref1 and !pending_pref1.sun_class.full?
+          pending_pref = pending_pref1
+          pending_assignment = self.class_assignments.where(sun_class_id: pending_pref1.sun_class.id).first || self.class_assignments.build(sun_class: pending_pref1.sun_class)
+
+          hours_to_fill -= 1
+          next
+        end
+
+        #otherwise process 2nd preference
+
+        pending_pref2 = processPreference(2,day, hour, preferences, assigned)
+
+        #if there is no 2nd preference, wait list first pref and continue
+        if !pending_pref2
+          self.wait_list_assignments.find_or_create_by :sun_class => pending_pref1.sun_class, :preference => 1, :reason => WaitListAssignment::REASONS[:full] if pending_pref1
+          next
+        end
+
+        #if 2nd preference is also full, wait list both
+        if pending_pref2.sun_class.full?
+          logger.debug "Creating waiting list assignment for both"
+          self.wait_list_assignments.find_or_create_by :sun_class => pending_pref2.sun_class, :preference => 2, :reason => WaitListAssignment::REASONS[:full]
+          self.wait_list_assignments.find_or_create_by :sun_class => pending_pref.sun_class, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
+        #otherwise pend assignment for 2nd preference
         else
-          logger.debug "Creating assignment for first"
-          pending_pref = wanted_pref1
-          pending_assignment = self.class_assignments.where(sun_class_id: wanted.id).first || self.class_assignments.build(sun_class: wanted)
+          logger.debug "Creating assignment for second"
+          pending_pref = pending_pref2
+          pending_assignment = self.class_assignments.where(sun_class_id: pending_pref2.sun_class.id).first || self.class_assignments.build(sun_class: pending_pref2.sun_class)
 
           hours_to_fill -= 1
         end
       end
 
       #Save pending class assignments if both hours were filled
+      logger.debug "Hours to fill: #{hours_to_fill}"
       if hours_to_fill == 0
         self.save!
       elsif hours_to_fill == 1
         #otherwise we know they only found a class for one hour and we insert that class into wait list assignment
         pending_assignment.delete
 
-        self.wait_list_assignment.find_or_create_by :sun_class => pending_pref.sun_class, :preference => pending_pref.order, :reason => WaitListAssignment::REASONS[:invalid_hours] 
+        self.wait_list_assignments.find_or_create_by :sun_class => pending_pref.sun_class, :preference => pending_pref.order, :reason => WaitListAssignment::REASONS[:invalid_hours] 
       end
     end
   end
@@ -126,5 +134,27 @@ class Student < ActiveRecord::Base
 
       student.save!
     end
+  end
+
+  private
+
+  def processPreference(order, day, hour, preferences, assignedList)
+    wanted_pref = preferences.find {|p| p.day == day and p.hour == hour and p.order == order }
+    #skip if they have a class with same name on a different day or hour but they are in the non-dupe list
+    return nil if !wanted_pref || isInDupeClass?(assignedList, wanted_pref.sun_class.name)
+    return wanted_pref
+  end
+
+  def isInDupeClass?(assignedList, name)
+    !(assignedList.find {|a| (a.name == name and a.name.in?(SunClass::NON_DUPE_CLASSES))}.nil?)
+  end
+
+  def isAlreadyAssigned?(assignedList, day, hour)
+    !(assignedList.find {|a| (a.day == day and a.hour == hour)}.nil?)
+  end
+
+  def class_assignment_added(c)
+    #Delete any wait list assignments for same class
+    self.wait_list_assignments.where(:sun_class_id => c.sun_class.id).each {|a| a.destroy}
   end
 end

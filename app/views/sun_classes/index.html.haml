@@ -1,6 +1,8 @@
 .page-header
-  %h1 Sun Classes
-
+  %h1 
+    Sun Classes
+    %small
+      =link_to 'Create a new class', new_sun_class_path(@sun_class)
 .row
   .col-sm-6
     = form_tag import_sun_classes_path, multipart: true do
@@ -21,30 +23,42 @@
     %thead
       %tr
         %th
-        %th Mon
-        %th Tues
-        %th Wed
-        %th Thurs
+        %th Mon (Total: #{@monClasses_hour1_total+@monClasses_hour2_total})
+        %th Tues (Total: #{@tuesClasses_hour1_total+@tuesClasses_hour2_total})
+        %th Wed (Total: #{@wedClasses_hour1_total+@wedClasses_hour2_total})
+        %th Thurs (Total: #{@thursClasses_hour1_total+@thursClasses_hour2_total})
     %tbody
       %tr
         %td Hour 1
-        -(0..maxNumClasses([@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1])).each do |n|
-          %tr
+        %td Total: #{@monClasses_hour1_total}
+        %td Total: #{@tuesClasses_hour1_total}
+        %td Total: #{@wedClasses_hour1_total}
+        %td Total: #{@thursClasses_hour1_total}
+      -(0..maxNumClasses([@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1])).each do |n|
+        %tr
+          %td
+          -[@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1].each do |classes|
             %td
-            -[@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1].each do |classes|
-              %td
-                -if classes.length > n
-                  =link_to(classes[n].name,classes[n])
-                  %br
-                  #{classes[n].class_assignments_count}/#{classes[n].limit} 
+              -if classes.length > n
+                =link_to(classes[n].name,classes[n])
+                %br
+                #{classes[n].class_assignments_count}/#{classes[n].limit} 
+                %br
+                #{classes[n].wait_list_assignments_count} Wait Listed
       %tr
         %td Hour 2
-        -(0..maxNumClasses([@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2])).each do |n|
-          %tr
+        %td Total: #{@monClasses_hour2_total}
+        %td Total: #{@tuesClasses_hour2_total}
+        %td Total: #{@wedClasses_hour2_total}
+        %td Total: #{@thursClasses_hour2_total}
+      -(0..maxNumClasses([@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2])).each do |n|
+        %tr
+          %td
+          -[@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2].each do |classes|
             %td
-            -[@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2].each do |classes|
-              %td
-                -if classes.length > n
-                  =link_to(classes[n].name,classes[n])
-                  %br
-                  #{classes[n].class_assignments_count}/#{classes[n].limit}
+              -if classes.length > n
+                =link_to(classes[n].name,classes[n])
+                %br
+                #{classes[n].class_assignments_count}/#{classes[n].limit}
+                %br
+                #{classes[n].wait_list_assignments_count} Wait Listed

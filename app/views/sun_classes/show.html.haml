@@ -1,2 +1,17 @@
-%h1 SunClasses#show
-%p Find me in app/views/sun_classes/show.html.haml
+.page-header
+  %h1
+    =@sun_class.name 
+    %small
+      =link_to 'Edit', edit_sun_class_path(@sun_class)
+    %small
+      =link_to 'Delete', sun_class_path(@sun_class), :method => :delete, :confirm => 'Are you sure? This will delete the class!'
+  %small 
+    #{@sun_class.class_assignments_count}/#{@sun_class.limit}. #{@sun_class.wait_list_assignments_count} Wait Listed
+.row
+  .col-md-12
+    %h2 Assigned Students
+  =render :partial => 'students/list', :locals => {:students => @sun_class.students}
+.row
+  .col-md-12
+    %h2 Wait Listed Students
+  =render :partial => 'students/list', :locals =>{:students => @sun_class.wait_list_students}

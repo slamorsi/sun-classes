@@ -1,0 +1,8 @@
+=simple_form_for sun_class, :html => {:class => 'form-horizontal'} do |f|
+  =f.input :name
+  =f.input :limit
+  =f.input :day
+  =f.input :hour
+  .form-group
+    =f.button :submit, :class => 'btn btn-primary'
+    =f.button :button, 'Reset', :type => 'reset', :class => 'btn btn-danger'

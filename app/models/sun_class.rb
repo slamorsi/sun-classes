@@ -6,12 +6,14 @@ class SunClass < ActiveRecord::Base
   has_many :students, :through => :class_assignments
 
   has_many :wait_list_assignments, :dependent => :destroy
-  has_many :wait_list_students, :class_name => Student, :through => :wait_list_assignments
+  has_many :wait_list_students, :source => :student, :through => :wait_list_assignments
 
   has_many :preferences, :dependent => :destroy
 
   scope :by_day, ->(day) {  where(day: day)}
   scope :by_hour, ->(hour) { where(hour: hour)}
+
+  validates_presence_of :name, :day, :hour, :limit
 
   def self.import(file)
     allowed_params = :name,:limit,:day, :hour

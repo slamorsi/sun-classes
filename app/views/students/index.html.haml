@@ -16,36 +16,5 @@
     = form_tag clear_all_assignments_students_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all class assignments, are you sure?');" do
       = submit_tag "Clear class assignments", :class => 'btn btn-danger'
 .row
-  %table.table.table-striped.table-hover.col-md-12.top-buffer
-    %thead
-      %tr 
-        %th Last Name
-        %th First Name
-        %th Classes
-        %th Preferences
-    %tbody
-      -@students.each do |s|
-        %tr
-          %td=s.last_name
-          %td=s.first_name
-          %td
-            %ol
-              -s.sun_classes.each do |c|
-                %li 
-                  "#{c.day} Hour #{c.hour} 
-                  =link_to c.name, c
-            -if s.wait_list_assignments.length > 0
-              %br 
-              Wait listed for:
-              %ol
-                -s.wait_list_assignments.each do |c|
-                  %li 
-                    #{c.sun_class.day} Hour #{c.sun_class.hour} 
-                    =link_to c.sun_class.name, c.sun_class
-                    \-#{c.reason}
-          %td
-            %ol
-              -s.preferences.each do |p|
-                %li 
-                  "#{p.day} Hour #{p.hour} Preference##{p.order}:"
-                  =link_to p.sun_class.name, p.sun_class
+  =render :partial => 'list', :locals =>  {:students => @students}
+  
