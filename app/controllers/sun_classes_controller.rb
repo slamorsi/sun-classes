@@ -16,10 +16,10 @@ class SunClassesController < ApplicationController
 
   def index
     @sClasses = SunClass.all
-    @monClasses = @sClasses.by_day('Mon')
-    @tuesClasses = @sClasses.by_day('Tues')
-    @wedClasses = @sClasses.by_day('Wed')
-    @thursClasses = @sClasses.by_day('Thurs')
+    @monClasses = @sClasses.by_day('mon')
+    @tuesClasses = @sClasses.by_day('tues')
+    @wedClasses = @sClasses.by_day('wed')
+    @thursClasses = @sClasses.by_day('thurs')
 
     @monClasses_hour1 = @monClasses.by_hour(1)
     @tuesClasses_hour1 = @tuesClasses.by_hour(1)

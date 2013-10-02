@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130930211817) do
+ActiveRecord::Schema.define(version: 20131001221418) do
 
   create_table "class_assignments", force: true do |t|
     t.integer  "sun_class_id"
@@ -44,6 +44,8 @@ ActiveRecord::Schema.define(version: 20130930211817) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "hour"
+    t.integer  "class_assignments_count",     default: 0, null: false
+    t.integer  "wait_list_assignments_count", default: 0, null: false
   end
 
   create_table "wait_list_assignments", force: true do |t|
@@ -51,6 +53,7 @@ ActiveRecord::Schema.define(version: 20130930211817) do
     t.integer  "student_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "preference"
   end
 
 end

@@ -25,16 +25,20 @@
         -(0..maxNumClasses([@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1])).each do |n|
           %tr
             %td
-            %td=link_to(@monClasses_hour1[n].name,@monClasses_hour1[n]) if @monClasses_hour1.length > n
-            %td=link_to(@tuesClasses_hour1[n].name,@tuesClasses_hour1[n]) if @tuesClasses_hour1.length > n
-            %td=link_to(@wedClasses_hour1[n].name,@wedClasses_hour1[n]) if @wedClasses_hour1.length > n
-            %td=link_to(@thursClasses_hour1[n].name,@thursClasses_hour1[n]) if @thursClasses_hour1.length > n
+            -[@monClasses_hour1, @tuesClasses_hour1, @wedClasses_hour1, @thursClasses_hour1].each do |classes|
+              %td
+                -if classes.length > n
+                  =link_to(classes[n].name,classes[n])
+                  %br
+                  #{classes[n].class_assignments_count}/#{classes[n].limit} 
       %tr
         %td Hour 2
         -(0..maxNumClasses([@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2])).each do |n|
           %tr
             %td
-            %td=link_to(@monClasses_hour2[n].name,@monClasses_hour2[n]) if @monClasses_hour2.length > n
-            %td=link_to(@tuesClasses_hour2[n].name,@tuesClasses_hour2[n]) if @tuesClasses_hour2.length > n
-            %td=link_to(@wedClasses_hour2[n].name,@wedClasses_hour2[n]) if @wedClasses_hour2.length > n
-            %td=link_to(@thursClasses_hour2[n].name,@thursClasses_hour2[n]) if @thursClasses_hour2.length > n
+            -[@monClasses_hour2, @tuesClasses_hour2, @wedClasses_hour2, @thursClasses_hour2].each do |classes|
+              %td
+                -if classes.length > n
+                  =link_to(classes[n].name,classes[n])
+                  %br
+                  #{classes[n].class_assignments_count}/#{classes[n].limit}

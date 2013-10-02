@@ -10,6 +10,12 @@
     = form_tag clear_students_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all current students, are you sure?');" do
       = submit_tag "Clear Existing Students", :class => 'btn btn-danger'
 .row
+  .col-md-12
+    = form_tag assign_all_students_path, :class => 'top-buffer' do
+      = submit_tag "Assign Students", :class => 'btn btn-success'
+    = form_tag clear_all_assignments_students_path, :class => 'top-buffer',:onsubmit=>"return confirm('This will delete all class assignments, are you sure?');" do
+      = submit_tag "Clear class assignments", :class => 'btn btn-danger'
+.row
   %table.table.table-striped.table-hover.col-md-12.top-buffer
     %thead
       %tr 
@@ -23,6 +29,19 @@
           %td=s.last_name
           %td=s.first_name
           %td
+            %ol
+              -s.sun_classes.each do |c|
+                %li 
+                  "#{c.day} Hour #{c.hour} 
+                  =link_to c.name, c
+            -if s.wait_list_classes.length > 0
+              %br 
+              Wait listed for:
+              %ol
+                -s.wait_list_classes.each do |c|
+                  %li 
+                    "#{c.day} Hour #{c.hour} 
+                    =link_to c.name, c
           %td
             %ol
               -s.preferences.each do |p|

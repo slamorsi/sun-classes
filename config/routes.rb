@@ -3,6 +3,8 @@ SUNClasses::Application.routes.draw do
     collection do
       post :import 
       post :clear
+      post :assign_all
+      post :clear_all_assignments
     end
   end
   resources :sun_classes do
