@@ -16,9 +16,12 @@ class SunClass < ActiveRecord::Base
 
   validates_presence_of :name, :day, :hour, :limit
 
-  def self.import(file)
+  def self.import(pfath)
+    logger.debug "spreadsheet now"
+    # logger.debug File.read(s)
+    spreadsheet = Roo::Csv.new(pfath)
+    # logger.debug spreadsheet.to_csv
     allowed_params = :name,:limit,:day, :hour
-    spreadsheet = open_spreadsheet(file)
 
     hour_col = 1
     header = spreadsheet.row(1).map{ |h| h.strip.downcase}
@@ -38,12 +41,13 @@ class SunClass < ActiveRecord::Base
         row['hour'] = spreadsheet.cell(i, hour_col)
         row.delete_if {|k,v| !k.in? allowed_params.map{|p| p.to_s}}
 
-        sun_class = where(name: row["name"], day: row["day"], hour: row["hour"]).first || new
+        sun_class = SunClass.where(name: row["name"], day: row["day"], hour: row["hour"]).first || SunClass.new
         parameters = ActionController::Parameters.new(row.to_hash)
         sun_class.attributes = parameters.permit(allowed_params)
         sun_class.save! 
       end
     end
+    File.delete(pfath)
   end
 
   def full?

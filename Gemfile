@@ -14,6 +14,7 @@ gem 'haml-rails'
 gem 'simple_form', '>= 3.0.0.rc'
 gem 'thin'
 
+# gem 'syck'
 gem 'roo'
 gem 'pg', :group => :production
 gem 'rails_12factor', group: :production

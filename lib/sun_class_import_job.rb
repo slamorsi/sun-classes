@@ -1,5 +1,5 @@
-class SunClassImportJob < Struct.new(:file)
-  def perform
-    SunClass.import(params[:file])
+class SunClassImportJob < Struct.new(:sheet)
+  def perform()
+    SunClass.import([])
   end
 end
