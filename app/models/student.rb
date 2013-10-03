@@ -10,18 +10,11 @@ class Student < ActiveRecord::Base
 
   validates_presence_of :first_name, :last_name, :student_id
 
-  scope :sorted_preferences, -> {
-    order("preferences.hour ASC,'preferences.order' ASC")
+  scope :sorted_preferences, -> {order("case when preferences.day='mon' then 1 when preferences.day='tues' then 2 when preferences.day='wed' then 3 when preferences.day='thurs' then 4 else 5 end ASC,preferences.hour ASC,preferences.\"order\" ASC")}
 
-  }
+  scope :sorted_classes, -> {order("case when sun_classes.day='mon' then 1 when sun_classes.day='tues' then 2 when sun_classes.day='wed' then 3 when sun_classes.day='thurs' then 4 else 5 end ASC,sun_classes.hour ASC")}
 
-  scope :sorted_classes, -> {
-    order("sun_classes.hour ASC,'sun_classes.order' ASC")
-  }
-
-  scope :sorted_wait_classes, -> {
-    order("sun_classes.hour ASC,'sun_classes.order' ASC")
-  }
+  scope :sorted_wait_classes, -> {order("case when sun_classes.day='mon' then 1 when sun_classes.day='tues' then 2 when sun_classes.day='wed' then 3 when sun_classes.day='thurs' then 4 else 5 end ASC,sun_classes.hour ASC")}
 
   def full_name
     "#{self.first_name.present? ? self.first_name + " " : ""}#{self.last_name}"
