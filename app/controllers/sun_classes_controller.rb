@@ -2,8 +2,9 @@ class SunClassesController < ApplicationController
 
   def import
     if params[:file]
+      # Delayed::Job.enqueue SunClassImportJob.new(params[:file]), :queue => 'importing_classes'
       SunClass.import(params[:file])
-      redirect_to sun_classes_path, notice: "Classes imported."
+      redirect_to sun_classes_path, notice: "Classes are being imported, refresh page periodically to see updates"
     else
       redirect_to sun_classes_path, alert: "Missing file.", status: :unprocessable_entity
     end

@@ -35,15 +35,15 @@ class StudentsController < ApplicationController
   end
 
   def assign_all
-    Student.order('RANDOM()').includes(:sun_classes).includes(:wait_list_classes).includes(:preferences).references(:preferences, :sun_classes).each do |s|
-      s.assign_class()
-    end
-    redirect_to students_path, notice: "Students assigned"
+    assign_students()
+    redirect_to students_path, notice: "Students are being assigned, refresh page periodically to see updates"
   end
+
   def import
     if params[:file]
+      # Student.delay(:queue => 'importing_students')
       Student.import(params[:file])
-      redirect_to students_path, notice: "Students imported."
+      redirect_to students_path, notice: "Students are being imported, refresh page periodically to see updates."
     else
       redirect_to students_path, alert: "Missing file.", status: :unprocessable_entity
     end
@@ -100,5 +100,11 @@ class StudentsController < ApplicationController
 
   def student_params
     params.require(:student).permit(:first_name, :last_name, :student_id)
+  end
+
+  def assign_students
+    Student.order('RANDOM()').includes(:sun_classes).includes(:wait_list_classes).includes(:preferences).references(:preferences, :sun_classes).each do |s|
+      s.assign_class()
+    end
   end
 end

@@ -69,7 +69,7 @@ class Student < ActiveRecord::Base
         if pending_pref2.sun_class.full?
           logger.debug "Creating waiting list assignment for both"
           self.wait_list_assignments.find_or_create_by :sun_class => pending_pref2.sun_class, :preference => 2, :reason => WaitListAssignment::REASONS[:full]
-          self.wait_list_assignments.find_or_create_by :sun_class => pending_pref.sun_class, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
+          self.wait_list_assignments.find_or_create_by :sun_class => pending_pref1.sun_class, :preference => 1, :reason => WaitListAssignment::REASONS[:full]
         #otherwise pend assignment for 2nd preference
         else
           logger.debug "Creating assignment for second"
