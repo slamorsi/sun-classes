@@ -1,6 +1,8 @@
 =simple_form_for student, :html => {:class => 'form-horizontal'} do |f|
   =f.input :first_name
   =f.input :last_name
+  =f.input :student_id, input_html: {value: nil}, :label => 'Student ID'
+
   .form-group
     =f.button :submit, :class => 'btn btn-primary'
     =f.button :button, 'Reset', :type => 'reset', :class => 'btn btn-danger'

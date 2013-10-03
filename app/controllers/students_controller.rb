@@ -67,7 +67,7 @@ class StudentsController < ApplicationController
   def create
     @student = Student.new student_params
     if @student.save
-      redirect_to student_path @student, :notice => "#{@student.name} created!"
+      redirect_to student_path @student, :notice => "#{@student.full_name} created!"
     else
       render :action => 'new'
     end
@@ -80,7 +80,7 @@ class StudentsController < ApplicationController
   def update
     @student = Student.find(params[:id])
     if @student.update_attributes(student_attributes)
-      redirect_to student_path @student, :notice => "#{@student.name} updated!"
+      redirect_to student_path @student, :notice => "#{@student.full_name} updated!"
     else
       render :action => 'edit'
     end
@@ -99,6 +99,6 @@ class StudentsController < ApplicationController
   private
 
   def student_params
-    params.require(:student).permit(:first_name, :last_name)
+    params.require(:student).permit(:first_name, :last_name, :student_id)
   end
 end

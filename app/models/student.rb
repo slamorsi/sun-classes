@@ -8,7 +8,7 @@ class Student < ActiveRecord::Base
 
   has_many :preferences, :dependent => :destroy 
 
-  validates_presence_of :first_name, :last_name
+  validates_presence_of :first_name, :last_name, :student_id
 
   scope :sorted_preferences, -> {order("case when preferences.day='mon' then 1 when preferences.day='tues' then 2 when preferences.day='wed' then 3 when preferences.day='thurs' then 4 else 5 end ASC,preferences.hour ASC,'preferences.order' ASC")}
 
