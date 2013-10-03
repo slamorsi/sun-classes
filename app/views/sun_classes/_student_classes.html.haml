@@ -16,7 +16,12 @@
           %td
             -if sun_classes.find_by_day_and_hour(day, hour)
               =link_to sun_classes.find_by_day_and_hour(day, hour).name, sun_classes.find_by_day_and_hour(day, hour) 
+              %br
+              =link_to "Remove", unassign_student_path(student, sun_classes.find_by_day_and_hour(day, hour)), :method => :delete, :class => 'btn btn-danger', 'data-confirm' => 'Are you sure? This will remove the student from this class.'
             -else
+              %a.available_classes{:href=>'#', :data=>{toggle: 'popover',html: 'true', placement: 'auto', content: render(:partial=>'sun_classes/available_classes',:locals=>{sun_classes: @available_classes.where(:day => day, :hour => hour),student: student})}} Available classes for this slot
               %ol
                 -wait_list_assignments.includes(:sun_class).references(:sun_classes).where('sun_classes.day = ? and sun_classes.hour = ?',day, hour).each do |a|
                   %li Wait listed for #{a.sun_class.name}: #{a.reason}
+:javascript
+  $('.available_classes').popover()

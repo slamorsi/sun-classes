@@ -1,7 +1,7 @@
 class SunClass < ActiveRecord::Base
   extend Importable
 
-  NON_DUPE_CLASSES = %w(Spanish, Chess, Zumba, Ceramics)
+  NON_DUPE_CLASSES = %w(spanish chess zumba ceramics)
   has_many :class_assignments, :dependent => :destroy
   has_many :students, :through => :class_assignments
 
@@ -12,6 +12,7 @@ class SunClass < ActiveRecord::Base
 
   scope :by_day, ->(day) {  where(day: day)}
   scope :by_hour, ->(hour) { where(hour: hour)}
+  scope :available, -> { where('"limit" > "class_assignments_count"')}
 
   validates_presence_of :name, :day, :hour, :limit
 

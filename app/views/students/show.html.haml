@@ -8,4 +8,4 @@
 .row
   .col-md-12
     %h2 Assigned Classes
-    =render :partial => 'sun_classes/student_classes', :locals => {:sun_classes => @student.sun_classes, :wait_list_assignments => @student.wait_list_assignments}
+    =render :partial => 'sun_classes/student_classes', :locals => {:sun_classes => @student.sun_classes, :wait_list_assignments => @student.wait_list_assignments, :student => @student}

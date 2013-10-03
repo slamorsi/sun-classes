@@ -6,21 +6,31 @@ class StudentsController < ApplicationController
     redirect_to students_path, notice: "Student assignments cleared"
   end
 
+  def unassign
+    @student = Student.find(params[:id])
+
+    @student.class_assignments.where(:sun_class_id => params[:sun_class_id]).destroy_all
+
+    redirect_to student_path(@student), :notice => "Student removed from class."
+  end
+
   def assign
     @student = Student.find(params[:id])
     @sun_class = SunClass.find(params[:sun_class_id])
 
-    isFull = !@sun_class.full?
-    if !isFull
-      isAlreadyAssigned = @student.sun_classes.find(@sun_class.id)
-      if !isAlreadyAssigned
+    if !@sun_class.full?
+      isAlreadyAssigned = @student.sun_classes.where(id: @sun_class.id)
+      if isAlreadyAssigned.empty?
+        if @student.isInDupeClass?(@student.sun_classes,@sun_class.name)
+          return redirect_to student_path(@student), :alert => "Could not add to #{@sun_class.name} because student is already taking this non-duplicable class another time"
+        end
         @student.class_assignments.create :sun_class => @sun_class
-        redirect_to students_path, :notice "Student assigned to: #{@sun_class.name}"
+        redirect_to student_path(@student), :notice => "Student assigned to: #{@sun_class.name}"
       else
-        redirect_to students_path, :alert "Student was already assigned to: #{@sun_class.name}"
+        redirect_to student_path(@student), :alert => "Student was already assigned to: #{@sun_class.name}"
       end
     else
-      redirect_to students_path, :alert "#{@sun_class.name} is full!"
+      redirect_to student_path(@student), :alert => "#{@sun_class.name} is full!"
     end
   end
 
@@ -50,6 +60,8 @@ class StudentsController < ApplicationController
 
   def show
     @student = Student.includes(:sun_classes, :wait_list_classes, :class_assignments, :wait_list_assignments).references(:sun_classes, :class_assignments, :wait_list_assignments).find(params[:id])
+
+    @available_classes = SunClass.available
   end
 
   def create

@@ -94,32 +94,36 @@ class Student < ActiveRecord::Base
   end
 
   def self.import(file)
-    #last,  first,  hour, day         ,day2    ,etc
-    #name,  name,   1,    pref1, pref2,
-    #               2,    pref1, pref2,
+    #last,  first,  student id, hour, day         ,day2    ,etc
+    #name,  name,               1,    pref1, pref2,
+    #                           2,    pref1, pref2,
     spreadsheet = open_spreadsheet(file)
     header = spreadsheet.row(1)
-    (2..spreadsheet.last_row).step(2) do |i|
+    (2..31).step(2) do |i|
       #sets the last, first names
       names = Hash[[header[0..1].map{ |n| n.strip.downcase+'_name'}, spreadsheet.row(i)[0..1].map{|n| n.strip if n}].transpose]
       logger.debug "(#{i}) Student names: #{names}"
 
-      parameters = ActionController::Parameters.new(names.to_hash)
+      parameters = ActionController::Parameters.new(names.to_hash.merge(student_id: spreadsheet.row(i)[2]))
 
-      student = new
-      student.attributes = parameters.permit(:first_name,:last_name)
+      attributes = parameters.permit(:first_name,:last_name, :student_id)
+
+      if attributes[:student_id]
+        student = find_by_student_id(attributes[:student_id]) || new(attributes)
+      else 
+        student = new attributes
+      end
 
       p1,p2 = nil
-      hour_column = 3
+      hour_column = 4
       #starting at first day column
-      (4..spreadsheet.last_column).each do |d|
+      (5..spreadsheet.last_column).each do |d|
         #header is 0 indexed array so -1
         day = header[d-1].downcase
         logger.debug "(#{d-1}) day: #{day}"
 
         d2 = d
 
-        #first preference for hour1 and hour2
         (i..i+1).each do |h| 
           next if (spreadsheet.empty?(h,d2))
           #hours will be in column 3
@@ -128,12 +132,30 @@ class Student < ActiveRecord::Base
           logger.debug "(#{h},#{d2}) class: #{spreadsheet.cell(h,d2)}"
           sClass = SunClass.find_by_name_and_hour_and_day(spreadsheet.cell(h,d2), hour, day)
           logger.debug "Found class: #{sClass.to_json}"
-          student.preferences.build order: d%2+1,day: day, hour: hour, sun_class: sClass if sClass
+          if sClass
+            previousPreference = student.preferences.find_by_sun_class_id(sClass.id)
+
+            if previousPreference.nil?
+              student.preferences.build order: (d-1)%2+1,day: day, hour: hour, sun_class: sClass
+            else
+              if !(previousPreference.order == d%2 and previousPreference.day == day and previousPreference.hour == hour)
+                previousPreference.update_attributes(order: d%2,day: day, hour: hour)
+              end
+            end
+          end
         end
       end
 
       student.save!
     end
+  end
+
+  def isInDupeClass?(assignedList, name)
+    !(assignedList.find {|a| (a.name.downcase == name.downcase and a.name.downcase.in?(SunClass::NON_DUPE_CLASSES))}.nil?)
+  end
+
+  def isAlreadyAssigned?(assignedList, day, hour)
+    !(assignedList.find {|a| (a.day == day and a.hour == hour)}.nil?)
   end
 
   private
@@ -143,14 +165,6 @@ class Student < ActiveRecord::Base
     #skip if they have a class with same name on a different day or hour but they are in the non-dupe list
     return nil if !wanted_pref || isInDupeClass?(assignedList, wanted_pref.sun_class.name)
     return wanted_pref
-  end
-
-  def isInDupeClass?(assignedList, name)
-    !(assignedList.find {|a| (a.name == name and a.name.in?(SunClass::NON_DUPE_CLASSES))}.nil?)
-  end
-
-  def isAlreadyAssigned?(assignedList, day, hour)
-    !(assignedList.find {|a| (a.day == day and a.hour == hour)}.nil?)
   end
 
   def class_assignment_added(c)

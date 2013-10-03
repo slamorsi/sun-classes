@@ -6,6 +6,10 @@ SUNClasses::Application.routes.draw do
       post :assign_all
       post :clear_all_assignments
     end
+    member do
+      post '/sun_class/:sun_class_id', :action => :assign, :as => :assign
+      delete '/sun_class/:sun_class_id', :action => :unassign, :as => :unassign
+    end
   end
   resources :sun_classes do
     collection do

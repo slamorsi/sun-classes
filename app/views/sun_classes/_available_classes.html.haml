@@ -1,0 +1,4 @@
+%ul.list-unstyled
+  -sun_classes.each do |c|
+    %li
+      =link_to "Assign to #{c.name}", assign_student_path(student, c), :method => :post
