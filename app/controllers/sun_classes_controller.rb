@@ -2,7 +2,7 @@ class SunClassesController < ApplicationController
 
   def import
     if params[:file]
-      file_path = "./tmp/citemp#{DateTime.new.to_s}.#{File.extname(params[:file].original_filename)}"
+      file_path = "/tmp/citemp#{DateTime.new.to_s}.#{File.extname(params[:file].original_filename)}"
       FileUtils.cp(params[:file].tempfile, file_path)
       SunClass.delay(:queue => 'classes_import').import(path: file_path, original_filename: params[:file].original_filename)
 
