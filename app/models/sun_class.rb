@@ -1,7 +1,7 @@
 class SunClass < ActiveRecord::Base
   extend Importable
 
-  NON_DUPE_CLASSES = %w(spanish chess zumba ceramics)
+  NON_DUPE_CLASSES = %w(ceramics)
   has_many :class_assignments, :dependent => :destroy
   has_many :students, :through => :class_assignments
 
