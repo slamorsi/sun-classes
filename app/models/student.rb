@@ -148,6 +148,7 @@ class Student < ActiveRecord::Base
 
       student.save!
     end
+    File.delete(file[:path])
   end
 
   def isInDupeClass?(assignedList, name)

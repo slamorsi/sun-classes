@@ -2,15 +2,10 @@ class SunClassesController < ApplicationController
 
   def import
     if params[:file]
-      # tmp_file = Tempfile.new(params[:file].original_filename)
+      file_path = "#{Rails.root}/tmp/citemp#{DateTime.new.to_s}.csv"
+      FileUtils.mv(params[:file].tempfile, file_path)
+      SunClass.delay(:queue => 'classes_import').import(path: file_path, original_filename: params[:file].original_filename)
 
-      spreadsheet = SunClass.open_spreadsheet(params[:file])
-      file_path = "#{Rails.root}/tmp/temp#{DateTime.new.to_s}.csv"
-      spreadsheet.to_csv(file_path)
-      # logger.debug spreadsheetl
-      SunClass.delay(:queue => 'classes_import').import(file_path)
-      # Delayed::Job.enqueue SunClassImportJob.new(spreadsheet), :queue => 'importing_classes'
-      # SunClass.import(params[:file])
       redirect_to sun_classes_path, notice: "Classes are being imported, refresh page periodically to see updates"
     else
       redirect_to sun_classes_path, alert: "Missing file.", status: :unprocessable_entity
@@ -48,10 +43,6 @@ class SunClassesController < ApplicationController
     @tuesClasses_hour2_total = @tuesClasses_hour2.map {|c| c.class_assignments_count}.reduce(0, :+)
     @wedClasses_hour2_total = @wedClasses_hour2.map {|c| c.class_assignments_count}.reduce(0, :+)
     @thursClasses_hour2_total = @wedClasses_hour2.map {|c| c.class_assignments_count}.reduce(0, :+)
-
-    if Delayed::Job.where(:queue=>'classes_import').length > 0
-      return render notice: "Classes are being imported, refresh page periodically to see updates"
-    end
   end
 
   def show

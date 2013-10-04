@@ -21,6 +21,8 @@ gem 'rails_12factor', group: :production
 gem 'sqlite3', :group => [:development,:test]
 
 gem 'delayed_job_active_record'
+gem "workless", "~> 1.1.3"
+
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller', :platforms=>[:mri_19, :mri_20, :rbx]

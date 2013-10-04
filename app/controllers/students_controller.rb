@@ -16,7 +16,7 @@ class StudentsController < ApplicationController
 
   def assign
     @student = Student.find(params[:id])
-    @sun_class = SunClass.find(params[:sun_class_id])
+    @sun_class = Student.find(params[:sun_class_id])
 
     if !@sun_class.full?
       isAlreadyAssigned = @student.sun_classes.where(id: @sun_class.id)
@@ -35,14 +35,15 @@ class StudentsController < ApplicationController
   end
 
   def assign_all
-    assign_students()
+    Delayed::Job.enqueue AssignStudentsJob.new, :queue => 'assigning_students'
     redirect_to students_path, notice: "Students are being assigned, refresh page periodically to see updates"
   end
 
   def import
     if params[:file]
-      # Student.delay(:queue => 'importing_students')
-      Student.import(params[:file])
+      file_path = "#{Rails.root}/tmp/sitemp#{DateTime.new.to_s}.csv"
+      FileUtils.mv(params[:file].tempfile, file_path)
+      Student.delay(:queue => 'students_import').import(path: file_path, original_filename: params[:file].original_filename)
       redirect_to students_path, notice: "Students are being imported, refresh page periodically to see updates."
     else
       redirect_to students_path, alert: "Missing file.", status: :unprocessable_entity
@@ -61,7 +62,7 @@ class StudentsController < ApplicationController
   def show
     @student = Student.includes(:sun_classes, :wait_list_classes, :class_assignments, :wait_list_assignments).references(:sun_classes, :class_assignments, :wait_list_assignments).find(params[:id])
 
-    @available_classes = SunClass.available
+    @available_classes = Student.available
   end
 
   def create
@@ -100,11 +101,5 @@ class StudentsController < ApplicationController
 
   def student_params
     params.require(:student).permit(:first_name, :last_name, :student_id)
-  end
-
-  def assign_students
-    Student.order('RANDOM()').includes(:sun_classes).includes(:wait_list_classes).includes(:preferences).references(:preferences, :sun_classes).each do |s|
-      s.assign_class()
-    end
   end
 end

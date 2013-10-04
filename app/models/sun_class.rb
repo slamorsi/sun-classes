@@ -16,10 +16,10 @@ class SunClass < ActiveRecord::Base
 
   validates_presence_of :name, :day, :hour, :limit
 
-  def self.import(pfath)
+  def self.import(file)
     logger.debug "spreadsheet now"
     # logger.debug File.read(s)
-    spreadsheet = Roo::Csv.new(pfath)
+    spreadsheet = open_spreadsheet(file)
     # logger.debug spreadsheet.to_csv
     allowed_params = :name,:limit,:day, :hour
 
@@ -47,7 +47,7 @@ class SunClass < ActiveRecord::Base
         sun_class.save! 
       end
     end
-    File.delete(pfath)
+    File.delete(file[:path])
   end
 
   def full?
