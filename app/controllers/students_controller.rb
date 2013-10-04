@@ -62,7 +62,7 @@ class StudentsController < ApplicationController
   def show
     @student = Student.includes(:sun_classes, :wait_list_classes, :class_assignments, :wait_list_assignments).references(:sun_classes, :class_assignments, :wait_list_assignments).find(params[:id])
 
-    @available_classes = Student.available
+    @available_classes = SunClass.available
   end
 
   def create
