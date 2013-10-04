@@ -88,7 +88,7 @@ class Student < ActiveRecord::Base
         #otherwise we know they only found a class for one hour and we insert that class into wait list assignment
         pending_assignment.delete if pending_assignment
 
-        self.wait_list_assignments.find_or_create_by :sun_class => pending_pref.sun_class, :preference => pending_pref.order, :reason => WaitListAssignment::REASONS[:invalid_hours] 
+        self.wait_list_assignments.find_or_create_by :sun_class => pending_pref.sun_class, :preference => pending_pref.order, :reason => WaitListAssignment::REASONS[:invalid_hours]  if pending_pref
       end
     end
   end
