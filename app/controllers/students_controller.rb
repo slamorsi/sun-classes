@@ -41,7 +41,7 @@ class StudentsController < ApplicationController
 
   def import
     if params[:file]
-      file_path = "#{Rails.root}/tmp/sitemp#{DateTime.new.to_s}.#{File.extname(params[:file].original_filename)}"
+      file_path = "./tmp/sitemp#{DateTime.new.to_s}.#{File.extname(params[:file].original_filename)}"
       FileUtils.cp(params[:file].tempfile, file_path)
       Student.delay(:queue => 'students_import').import(path: file_path, original_filename: params[:file].original_filename)
       redirect_to students_path, notice: "Students are being imported, refresh page periodically to see updates."
