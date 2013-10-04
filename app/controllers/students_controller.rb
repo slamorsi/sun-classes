@@ -16,7 +16,7 @@ class StudentsController < ApplicationController
 
   def assign
     @student = Student.find(params[:id])
-    @sun_class = Student.find(params[:sun_class_id])
+    @sun_class = SunClass.find(params[:sun_class_id])
 
     if !@sun_class.full?
       isAlreadyAssigned = @student.sun_classes.where(id: @sun_class.id)
